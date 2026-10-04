@@ -114,7 +114,8 @@
   function guarda() { v.play().catch(() => {}); }
   document.getElementById("guarda").onclick = guarda;
   // prova a partire da solo all'apertura (se il telefono non lo permette, resta il ▶ dei comandi)
-  window.addEventListener("load", guarda);
+  // sul cellulare no: senza un tocco il telefono non concede lo schermo intero e resterebbe la barra dell'indirizzo
+  if (!cellulare) window.addEventListener("load", guarda);
   // a fine video: esce da solo dallo schermo intero e mostra il saluto
   v.addEventListener("ended", () => {
     ferma();
