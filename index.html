@@ -123,20 +123,19 @@
   });
   v.addEventListener("play", () => { document.getElementById("fine").style.display = "none"; });
   // sul cellulare: al primo tocco di ▶ schermo intero e, dove il telefono lo permette (Android), orizzontale
-  v.addEventListener("play", async () => {
+  async function schermoIntero() {
     if (!cellulare || document.fullscreenElement || v.webkitDisplayingFullscreen) return;
-    // Se il telefono è GIÀ in orizzontale il video riempie da solo lo schermo (vedi il CSS
-    // più sopra): chiedere lo schermo intero vero non servirebbe a nulla e farebbe comparire
-    // per qualche secondo l'avviso col nome del sito, che il browser mostra sempre e che
-    // non si può togliere. Quindi in orizzontale lo si lascia stare.
-    if (window.matchMedia("(orientation: landscape)").matches) return;
+    // a schermo intero anche col telefono già girato: così sparisce la barra del browser con l'indirizzo
     try {
       if (v.requestFullscreen) await v.requestFullscreen();
       else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); return; } // iPhone: si gira col telefono
       // Android: blocca lo schermo in orizzontale finché si resta a schermo intero
       if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape");
     } catch (e) { /* il telefono non lo consente: si continua normalmente */ }
-  });
+  }
+  v.addEventListener("play", schermoIntero);
+  // se il video è partito da solo (senza tocco il telefono non concede lo schermo intero), basta toccarlo
+  v.addEventListener("click", () => { if (!v.paused) schermoIntero(); });
   document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
       try { screen.orientation.unlock(); } catch (e) {}
