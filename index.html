@@ -48,6 +48,11 @@
           background: var(--scuro); color: var(--crema); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
   #fine { display: none; margin-top: 20px; font-size: 22px; text-align: center; line-height: 1.5; }
   #fine b { color: var(--oro); }
+  /* invito a girare il telefono, solo sul cellulare tenuto in verticale */
+  #gira { display: none; margin: 0 0 16px; padding: 12px 22px; border-radius: 12px; border: 2px solid var(--oro);
+          background: rgba(0,0,0,.25); font-size: 21px; font-weight: 600; text-align: center; }
+  #gira span { display: inline-block; font-size: 30px; vertical-align: middle; margin-right: 8px; }
+  @media (orientation: portrait) and (pointer: coarse) { #gira { display: block; } }
   /* cellulare in orizzontale: solo il video, grande quanto lo schermo */
   @media (orientation: landscape) and (pointer: coarse), (orientation: landscape) and (max-height: 600px) {
     body { padding: 0; justify-content: center; background: #000; min-height: 100vh; min-height: 100dvh; }
@@ -66,6 +71,7 @@
   <h1>Karaoke</h1>
   <div class="data">VIVA LA LUTE!</div>
   <div class="riga"></div>
+  <div id="gira"><span>📱↻</span>Giri il telefono in orizzontale</div>
   <div class="cornice">
     <video data-v="viva-la-lute-karaoke-v3.mp4" data-o="viva-la-lute-karaoke-oriz-v1.mp4" data-pv="copertina-karaoke-v3.jpg" data-po="anteprima-v3.jpg" controls playsinline preload="auto"></video>
   </div>
@@ -81,8 +87,9 @@
   // formato del video secondo lo schermo: orizzontale su PC e telefono girato (parole più grandi),
   // verticale sul telefono tenuto dritto. Se si gira il telefono durante l'ascolto, si riprende dallo stesso punto.
   const orizzontale = window.matchMedia("(orientation: landscape)");
+  const cellulare = window.matchMedia("(pointer: coarse)").matches;
   function scegliFormato() {
-    const o = orizzontale.matches, src = o ? v.dataset.o : v.dataset.v;
+    const o = orizzontale.matches || cellulare, src = o ? v.dataset.o : v.dataset.v;
     if (v.getAttribute("src") === src) return;
     const t = v.currentTime || 0, andava = !v.paused;
     v.poster = o ? v.dataset.po : v.dataset.pv; v.src = src;
@@ -113,7 +120,6 @@
   });
   v.addEventListener("play", () => { document.getElementById("fine").style.display = "none"; });
   // sul cellulare: al primo tocco di ▶ schermo intero e, dove il telefono lo permette (Android), orizzontale
-  const cellulare = window.matchMedia("(pointer: coarse)").matches;
   v.addEventListener("play", async () => {
     if (!cellulare || document.fullscreenElement || v.webkitDisplayingFullscreen) return;
     // Se il telefono è GIÀ in orizzontale il video riempie da solo lo schermo (vedi il CSS
@@ -123,8 +129,9 @@
     if (window.matchMedia("(orientation: landscape)").matches) return;
     try {
       if (v.requestFullscreen) await v.requestFullscreen();
-      else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); return; }
-      // video verticale: niente rotazione in orizzontale
+      else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); return; } // iPhone: si gira col telefono
+      // Android: blocca lo schermo in orizzontale finché si resta a schermo intero
+      if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape");
     } catch (e) { /* il telefono non lo consente: si continua normalmente */ }
   });
   document.addEventListener("fullscreenchange", () => {
