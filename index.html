@@ -128,7 +128,9 @@
     if (!cellulare || document.fullscreenElement || v.webkitDisplayingFullscreen) return;
     // a schermo intero anche col telefono già girato: così sparisce la barra del browser con l'indirizzo
     try {
-      if (v.requestFullscreen) await v.requestFullscreen();
+      // a schermo intero va l'INTERA pagina (col telefono girato contiene solo il video): più stabile del solo video
+      const pagina = document.documentElement;
+      if (pagina.requestFullscreen) await pagina.requestFullscreen({ navigationUI: "hide" });
       else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); return; } // iPhone: si gira col telefono
       // Android: blocca lo schermo in orizzontale finché si resta a schermo intero
       if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape");
@@ -138,9 +140,9 @@
   // se il video è partito da solo (senza tocco il telefono non concede lo schermo intero), basta toccarlo
   v.addEventListener("click", () => { if (!v.paused) schermoIntero(); });
   // a schermo intero niente comandi del video (la barra in basso): un tocco mette in pausa o fa ripartire
-  document.addEventListener("fullscreenchange", () => { v.controls = document.fullscreenElement !== v; });
+  document.addEventListener("fullscreenchange", () => { v.controls = !document.fullscreenElement; });
   v.addEventListener("click", () => {
-    if (document.fullscreenElement === v && !v.controls) { if (v.paused) v.play().catch(() => {}); else v.pause(); }
+    if (document.fullscreenElement && !v.controls) { if (v.paused) v.play().catch(() => {}); else v.pause(); }
   });
   document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
