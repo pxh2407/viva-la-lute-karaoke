@@ -124,8 +124,10 @@
   });
   v.addEventListener("play", () => { document.getElementById("fine").style.display = "none"; });
   // sul cellulare: al primo tocco di ▶ schermo intero e, dove il telefono lo permette (Android), orizzontale
+  let entrataSchermoIntero = 0;
   async function schermoIntero() {
     if (!cellulare || document.fullscreenElement || v.webkitDisplayingFullscreen) return;
+    entrataSchermoIntero = Date.now();
     // a schermo intero anche col telefono già girato: così sparisce la barra del browser con l'indirizzo
     try {
       // a schermo intero va l'INTERA pagina (col telefono girato contiene solo il video): più stabile del solo video
@@ -137,11 +139,15 @@
     } catch (e) { /* il telefono non lo consente: si continua normalmente */ }
   }
   v.addEventListener("play", schermoIntero);
+  // il telefono concede lo schermo intero solo NELL'ISTANTE del tocco: quindi lo si chiede subito,
+  // al primo tocco in qualsiasi punto (tranne Esci e Ferma), non quando il video comincia
+  document.addEventListener("pointerup", (e) => { if (!e.target.closest("#esci, #ferma")) schermoIntero(); }, true);
   // se il video è partito da solo (senza tocco il telefono non concede lo schermo intero), basta toccarlo
   v.addEventListener("click", () => { if (!v.paused) schermoIntero(); });
   // a schermo intero niente comandi del video (la barra in basso): un tocco mette in pausa o fa ripartire
   document.addEventListener("fullscreenchange", () => { v.controls = !document.fullscreenElement; });
   v.addEventListener("click", () => {
+    if (Date.now() - entrataSchermoIntero < 1000) return; // è il tocco che ha appena aperto lo schermo intero
     if (document.fullscreenElement && !v.controls) { if (v.paused) v.play().catch(() => {}); else v.pause(); }
   });
   document.addEventListener("fullscreenchange", () => {
