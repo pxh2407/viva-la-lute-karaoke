@@ -136,6 +136,11 @@
   v.addEventListener("play", schermoIntero);
   // se il video è partito da solo (senza tocco il telefono non concede lo schermo intero), basta toccarlo
   v.addEventListener("click", () => { if (!v.paused) schermoIntero(); });
+  // a schermo intero niente comandi del video (la barra in basso): un tocco mette in pausa o fa ripartire
+  document.addEventListener("fullscreenchange", () => { v.controls = document.fullscreenElement !== v; });
+  v.addEventListener("click", () => {
+    if (document.fullscreenElement === v && !v.controls) { if (v.paused) v.play().catch(() => {}); else v.pause(); }
+  });
   document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
       try { screen.orientation.unlock(); } catch (e) {}
