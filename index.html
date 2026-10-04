@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viva la LUTE – Base musicale</title>
+<meta name="description" content="LUTE Milazzo: Viva la LUTE, base musicale con le parole che scorrono. Segui le parole e canta con noi!">
+<!-- anteprima del collegamento su WhatsApp, Facebook, email -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="it_IT">
+<meta property="og:site_name" content="LUTE Milazzo">
+<meta property="og:title" content="Viva la LUTE – Base musicale">
+<meta property="og:description" content="Solo musica, con le parole che scorrono: segui le parole e canta con noi!">
+<meta property="og:image" content="https://pxh2407.github.io/viva-la-lute-karaoke/anteprima-v1.jpg">
+<meta property="og:image:secure_url" content="https://pxh2407.github.io/viva-la-lute-karaoke/anteprima-v1.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Viva la LUTE - LUTE Milazzo">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root { --verde: #1b5e3f; --scuro: #0e3423; --oro: #d2ac50; --crema: #f8f4ea; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; background: radial-gradient(circle at 50% 40%, var(--verde), var(--scuro) 75%);
+    color: var(--crema); font-family: "Segoe UI", system-ui, Arial, sans-serif;
+    display: flex; flex-direction: column; align-items: center; padding: 70px 16px 36px;
+  }
+  .alto { color: var(--oro); font-weight: 600; letter-spacing: .5px; font-size: 17px; text-align: center; }
+  h1 { font-family: Georgia, serif; font-weight: 400; font-style: italic; font-size: clamp(30px, 6vw, 46px); margin-top: 10px; text-align: center; }
+  .data { font-family: "Palatino Linotype", Palatino, Georgia, serif; font-weight: 700; color: var(--oro);
+          font-size: clamp(28px, 8vw, 66px); line-height: 1.1; text-align: center; }
+  .riga { width: 180px; height: 3px; background: var(--oro); margin: 16px 0 22px; }
+  video { width: 100%; max-width: 960px; max-height: 70vh; width: auto; border-radius: 14px; background: #000;
+          box-shadow: 0 12px 40px rgba(0,0,0,.45); }
+  .cornice { position: relative; width: 100%; max-width: 960px; display: flex; justify-content: center; }
+  #guarda { background: var(--oro); color: var(--scuro); font-size: 24px; padding: 16px 34px; }
+  .nota { margin-top: 18px; font-size: 19px; text-align: center; max-width: 640px; line-height: 1.5; }
+  .nota b { color: var(--oro); }
+  .pulsanti { display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  .pulsanti button {
+    font: inherit; font-size: 21px; font-weight: 600; padding: 14px 28px; border-radius: 12px;
+    cursor: pointer; min-width: 150px; border: 2px solid var(--oro);
+  }
+  #ferma { background: var(--crema); color: var(--scuro); }
+  /* Esci sempre visibile in alto a destra */
+  #esci { position: fixed; top: 12px; right: 12px; z-index: 10; min-width: 0; padding: 10px 18px;
+          background: var(--scuro); color: var(--crema); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
+  #fine { display: none; margin-top: 20px; font-size: 22px; text-align: center; line-height: 1.5; }
+  #fine b { color: var(--oro); }
+  /* cellulare in orizzontale: solo il video, grande quanto lo schermo */
+  @media (orientation: landscape) and (pointer: coarse), (orientation: landscape) and (max-height: 600px) {
+    body { padding: 0; justify-content: center; background: #000; min-height: 100vh; min-height: 100dvh; }
+    .alto, h1, .data, .riga, .nota, #fine, #ferma, #guarda { display: none !important; }
+    .cornice { max-width: none; }
+    .pulsanti { margin: 0; height: 0; }
+    video { width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none;
+            border-radius: 0; box-shadow: none; object-fit: contain; }
+    #esci { top: 8px; right: 8px; padding: 6px 14px; font-size: 17px; opacity: .85; }
+  }
+</style>
+</head>
+<body>
+  <div class="pulsanti"><button id="esci" type="button">✕ Esci</button></div>
+  <div class="alto">LUTE MILAZZO</div>
+  <h1>Base musicale</h1>
+  <div class="data">VIVA LA LUTE!</div>
+  <div class="riga"></div>
+  <div class="cornice">
+    <video src="viva-la-lute-karaoke-v1.mp4" poster="copertina-v2.jpg" controls playsinline preload="auto"></video>
+  </div>
+  <p class="nota" id="nota">Solo musica: la voce siete <b>voi</b>! Seguite le parole e cantate.</p>
+  <p id="fine">Grazie per aver cantato con noi!<br><b>Viva la LUTE, evviva la vita!</b></p>
+  <div class="pulsanti">
+    <button id="guarda" type="button">▶ Guarda il video</button>
+    <button id="ferma" type="button">⏹ Ferma</button>
+  </div>
+  <p class="nota" id="aiuto" hidden>Per chiudere, tocchi la <b>✕</b> o la freccia <b>←</b> in alto a sinistra dello schermo del telefono.</p>
+<script>
+  const v = document.querySelector("video");
+  function esciSchermoIntero() {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+    if (v.webkitDisplayingFullscreen) v.webkitExitFullscreen();
+  }
+  // ferma: interrompe il video e torna all'immagine iniziale
+  function ferma() {
+    v.pause(); esciSchermoIntero(); v.currentTime = 0; v.load();
+  }
+  document.getElementById("ferma").onclick = ferma;
+  // un tocco su "Guarda il video" fa partire il video
+  function guarda() { v.play().catch(() => {}); }
+  document.getElementById("guarda").onclick = guarda;
+  // prova a partire da solo all'apertura (se il telefono non lo permette, resta il ▶ dei comandi)
+  window.addEventListener("load", guarda);
+  // a fine video: esce da solo dallo schermo intero e mostra il saluto
+  v.addEventListener("ended", () => {
+    ferma();
+    document.getElementById("nota").style.display = "none";
+    document.getElementById("fine").style.display = "block";
+  });
+  v.addEventListener("play", () => { document.getElementById("fine").style.display = "none"; });
+  // sul cellulare: al primo tocco di ▶ schermo intero e, dove il telefono lo permette (Android), orizzontale
+  const cellulare = window.matchMedia("(pointer: coarse)").matches;
+  v.addEventListener("play", async () => {
+    if (!cellulare || document.fullscreenElement || v.webkitDisplayingFullscreen) return;
+    // Se il telefono è GIÀ in orizzontale il video riempie da solo lo schermo (vedi il CSS
+    // più sopra): chiedere lo schermo intero vero non servirebbe a nulla e farebbe comparire
+    // per qualche secondo l'avviso col nome del sito, che il browser mostra sempre e che
+    // non si può togliere. Quindi in orizzontale lo si lascia stare.
+    if (window.matchMedia("(orientation: landscape)").matches) return;
+    try {
+      if (v.requestFullscreen) await v.requestFullscreen();
+      else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); return; }
+      // video verticale: niente rotazione in orizzontale
+    } catch (e) { /* il telefono non lo consente: si continua normalmente */ }
+  });
+  document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+  });
+  // esci: prova a chiudere la pagina; se il telefono non lo permette, spiega come fare
+  document.getElementById("esci").onclick = () => {
+    ferma();
+    window.close();
+    setTimeout(() => {
+      if (history.length > 1) history.back();
+      document.getElementById("aiuto").hidden = false;
+    }, 300);
+  };
+</script>
+</body>
+</html>
